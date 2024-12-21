@@ -134,6 +134,7 @@ public class Board {
 		return -1;
 	}
 	
+	/*
 	public boolean solve(int piece, int col) {
 		if(piece > pieces || pieces <= 0) {
 			System.out.println("Error Solver: Piece Out of bounds");
@@ -157,6 +158,7 @@ public class Board {
 			
 		return false;
 	}
+	*/
 	
 	private boolean legalMove(int piece, int col, int row) {
 		if(piece > pieces || pieces <= 0) {
