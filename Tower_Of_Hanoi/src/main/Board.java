@@ -3,6 +3,11 @@ package main;
 public class Board {
 	private char board[][];
 	private int pieces;
+	public int BOTTOMROW;
+	public int POLEONE = 0;
+	public int POLETWO = 2;
+	public int POLETHREE = 4;
+	private int SOLUTIONPOLE = POLETHREE;
 	
 	public Board() {
 		pieces = 3;
@@ -16,6 +21,7 @@ public class Board {
 				
 		};
 		
+		BOTTOMROW = 3;
 		this.board = board;
 	}
 	public Board(int pieces) {
@@ -51,6 +57,7 @@ public class Board {
 		}
 		
 		this.board = board;
+		BOTTOMROW = board.length - 2;
 		
 	}
 	
@@ -58,35 +65,18 @@ public class Board {
 		return board;
 	}
 	
-	public void movePiece(int piece, char col, int row) {
-		if(piece > pieces || pieces <= 0 || row < 0 || row > pieces - 1) {
-			System.out.println("Error: Out of bounds");
+	public void movePiece(int piece, int col, int row) {
+		if(piece > pieces || pieces <= 0) {
+			System.out.println("Error Moving Piece: Piece Out of bounds");
+			return;
 		}
-		int theRow = row + 1; // Should add the ability to have row 0 = the ground
-		int theCol = 0;
-		
-		switch (col){
-			case 'A':
-				theCol = 0;
-				break;
-			case 'B':
-				theCol = 2;
-				break;
-			case 'C':
-				theCol = 4;
-				break;
-			case 'a':
-				theCol = 0;
-				break;
-			case 'b':
-				theCol = 2;
-				break;
-			case 'c':
-				theCol = 4;
-				break;
-				
-			default:
-				System.out.println("Error: Out of bounds");
+		if(row > BOTTOMROW || row < 1) {
+			System.out.println("Error Moving Piece: Row Out of bounds");
+			return;
+		}
+		if( col < POLEONE || col > POLETHREE) {
+			System.out.println("Error Moving Piece: Col Out of bounds");
+			return;
 		}
 		
 		int originalCol = findPieceCol(piece);
@@ -96,8 +86,11 @@ public class Board {
 			board[originalRow][originalCol] = 'x';
 		}
 		else {
-			System.out.println("Error: Could not find original piece");
+			System.out.println("Error Moving Piece: Could not find original piece");
+			return;
 		}
+		
+		board[row][col] = (char) (piece + 48);
 		
 	}
 	
@@ -139,6 +132,80 @@ public class Board {
 		
 		System.out.println("Error: Could not find");
 		return -1;
+	}
+	
+	public boolean solve(int piece, int col) {
+		if(piece > pieces || pieces <= 0) {
+			System.out.println("Error Solver: Piece Out of bounds");
+			return false;
+		}
+		if(col < 1 || col > 3) {
+			System.out.println("Error Solver: Col Out of bounds");
+			return false;
+		}
+		
+		if(solved()) {
+			return true;
+		}
+		
+		
+		if(findPieceCol(piece) == POLETHREE) {
+			solve(piece-1, col);
+		}
+		
+		
+			
+		return false;
+	}
+	
+	private boolean legalMove(int piece, int col, int row) {
+		if(piece > pieces || pieces <= 0) {
+			System.out.println("Error Moving Piece: Piece Out of bounds");
+			return false;
+		}
+		if(row > BOTTOMROW || row < 1) {
+			System.out.println("Error Moving Piece: Row Out of bounds");
+			return false;
+		}
+		if( col < POLEONE || col > POLETHREE) {
+			System.out.println("Error Moving Piece: Col Out of bounds");
+			return false;
+		}
+		
+		// Piece already there
+		if(board[col][row] == (char) (piece + 48)) {
+			return true;
+		}
+		
+		// If piece above it
+		if(board[col][row-1] != 'x') {
+			return false;
+		}
+		
+		
+		// Space is occupied
+		if(board[col][row] != 'x') {
+			return false;
+		}
+		
+		// If the piece below it is less than the piece we want to move, then it's an illegal move
+		if(row != BOTTOMROW && (int) (board[col][row+1] - 48) < piece) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean solved() {
+		int checkPiece = pieces;
+		for(int i = BOTTOMROW; i > 0; i++) {
+			if(board[BOTTOMROW][POLETHREE] != (char) (checkPiece + 48)) {
+				return false;
+			}
+			pieces--;
+		}
+		
+		return true;
 	}
 	
 	public String toString() {
