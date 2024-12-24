@@ -1,7 +1,7 @@
 package main;
 
 public class Board {
-	private char board[][];
+	private Piece board[][];
 	private int pieces;
 	public int BOTTOMROW;
 	public int POLEONE = 0;
@@ -9,47 +9,32 @@ public class Board {
 	public int POLETHREE = 4;
 	private int SOLUTIONPOLE = POLETHREE;
 	
-	public Board() {
-		pieces = 3;
-		
-		char board[][] = {
-				{'x', ' ', 'x', ' ', 'x'},
-				{'1', ' ', 'x', ' ', 'x'},
-				{'2', ' ', 'x', ' ', 'x'},
-				{'3', ' ', 'x', ' ', 'x'},
-				{'x', 'x', 'x', 'x', 'x'}
-				
-		};
-		
-		BOTTOMROW = 3;
-		this.board = board;
-	}
 	public Board(int pieces) {
 		this.pieces = pieces;
-		char board[][] = new char[pieces +2][5];
+		Piece board[][] = new Piece[pieces +2][5];
 		int placePiece = 0;
 		for(int row = 0; row < board.length; row++) {
 			for(int col = 0; col < board[row].length; col++) {
 				if(placePiece == 0) {
 					if(col % 2 == 0) {
-						board[row][col] = 'x';
+						board[row][col] = new Piece(0, col, row);
 					}
 					else {
-						board[row][col] = ' ';
+						board[row][col] = new Piece(-1, col, row);
 					}
 				}
 				else if(placePiece > pieces) {
-					board[row][col] = 'x';
+					board[row][col] = new Piece(0, col, row);
 				}
 				else {
 					if(col == 0) {
-						board[row][col] = (char) (placePiece + 48);
+						board[row][col] = new Piece(placePiece, col, row);
 					}
 					else if(col % 2 == 0){
-						board[row][col] = 'x';
+						board[row][col] = new Piece(0, col, row);
 					}
 					else {
-						board[row][col] = ' ';
+						board[row][col] = new Piece(-1, col, row);
 					}
 				}
 			}
@@ -61,13 +46,13 @@ public class Board {
 		
 	}
 	
-	public char[][] getBoard() {
+	public Piece[][] getBoard() {
 		return board;
 	}
 	
-	public void movePiece(int piece, int col, int row) {
-		if(piece > pieces || pieces <= 0) {
-			System.out.println("Error Moving Piece: Piece Out of bounds");
+	public void movePiece(Piece piece, int col, int row) {
+		if(piece.getValue() > pieces || piece.getValue() <= 0) {
+			System.out.println("Error Moving Piece: Piece cannot be moved or doesn't exist");
 			return;
 		}
 		if(row > BOTTOMROW || row < 1) {
@@ -79,61 +64,17 @@ public class Board {
 			return;
 		}
 		
-		int originalCol = findPieceCol(piece);
-		int originalRow = findPieceRow(piece);
-		
-		if(originalCol != -1 && originalRow != -1) {
-			board[originalRow][originalCol] = 'x';
+		if(legalMove(piece, col, row)) {
+			int originalRow = piece.y;
+			int originalCol = piece.x;
+			
+			board[originalRow][originalCol] = board[row][col];
+			board[row][col] = piece;
 		}
 		else {
-			System.out.println("Error Moving Piece: Could not find original piece");
-			return;
+			System.out.println("Illegal Move!");
 		}
-		
-		board[row][col] = (char) (piece + 48);
-		
-	}
-	
-	/*
-	 * Maybe I should make a piece class instead of running everything in the board ¯\_(ツ)_/¯
-	 */
-	
-	private int findPieceCol(int piece) {
-		if(piece > pieces || piece <= 0) {
-			System.out.println("Error: Out of Bounds");
-			return -1;
-		}
-		
-		for(int row = 0; row < board.length; row++) {
-			for(int col = 0; col < board.length; col++) {
-				if((int) board[row][col] - 48 == piece) {
-					return col;
-				}
-			}
-		}
-		
-		System.out.println("Error: Could not find");
-		return -1;
-	}
-	
-	private int findPieceRow(int piece) {
-		if(piece > pieces || piece <= 0) {
-			System.out.println("Error: Out of Bounds");
-			return -1;
-		}
-		
-		for(int row = 0; row < board.length; row++) {
-			for(int col = 0; col < board.length; col++) {
-				if((int) board[row][col] - 48 == piece) {
-					return row;
-				}
-			}
-		}
-		
-		System.out.println("Error: Could not find");
-		return -1;
-	}
-	
+	}	
 	/*
 	public boolean solve(int piece, int col) {
 		if(piece > pieces || pieces <= 0) {
@@ -160,9 +101,9 @@ public class Board {
 	}
 	*/
 	
-	private boolean legalMove(int piece, int col, int row) {
-		if(piece > pieces || pieces <= 0) {
-			System.out.println("Error Moving Piece: Piece Out of bounds");
+	private boolean legalMove(Piece piece, int col, int row) {
+		if(piece.getValue() > pieces || piece.getValue() <= 0) {
+			System.out.println("Error Moving Piece: Piece Cannot be moved or does not exist");
 			return false;
 		}
 		if(row > BOTTOMROW || row < 1) {
@@ -175,23 +116,23 @@ public class Board {
 		}
 		
 		// Piece already there
-		if(board[col][row] == (char) (piece + 48)) {
+		if(board[col][row].getValue() == piece.getValue()) {
 			return true;
 		}
 		
 		// If piece above it
-		if(board[col][row-1] != 'x') {
+		if(board[col][row-1].getValue() != 0) {
 			return false;
 		}
 		
 		
 		// Space is occupied
-		if(board[col][row] != 'x') {
+		if(board[col][row].getValue() != 0) {
 			return false;
 		}
 		
 		// If the piece below it is less than the piece we want to move, then it's an illegal move
-		if(row != BOTTOMROW && (int) (board[col][row+1] - 48) < piece) {
+		if(row != BOTTOMROW && board[col][row+1].getValue() < piece.getValue()) {
 			return false;
 		}
 		
@@ -201,13 +142,17 @@ public class Board {
 	public boolean solved() {
 		int checkPiece = pieces;
 		for(int i = BOTTOMROW; i > 0; i++) {
-			if(board[BOTTOMROW][POLETHREE] != (char) (checkPiece + 48)) {
+			if(board[BOTTOMROW][POLETHREE].getValue() != checkPiece) {
 				return false;
 			}
 			pieces--;
 		}
 		
 		return true;
+	}
+	
+	public Piece getPiece(int y, int x) {
+		return board[y][x];
 	}
 	
 	public String toString() {
