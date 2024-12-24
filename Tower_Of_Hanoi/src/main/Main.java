@@ -6,21 +6,23 @@ public class Main {
 		
 		System.out.println(board);
 		
-		board.movePiece(board.getPiece(board.BOTTOMROW, board.POLEONE), board.POLETHREE, board.BOTTOMROW);
-		//board.movePiece(2, board.POLETHREE, board.BOTTOMROW-1);
-		//board.movePiece(1, board.POLETHREE, board.BOTTOMROW-2);
+		board.solve(board.findPiece(3), board.POLETHREE);
+		/*
+		board.sudoMovePiece(board.getPiece(board.POLEONE, board.BOTTOMROW-2), board.POLETHREE, board.BOTTOMROW);
+		board.sudoMovePiece(board.getPiece(board.POLEONE, board.BOTTOMROW-1), board.POLETWO, board.BOTTOMROW);
+		board.sudoMovePiece(board.getPiece(board.POLETHREE, board.BOTTOMROW), board.POLETWO, board.BOTTOMROW-1);
+		board.sudoMovePiece(board.getPiece(board.POLEONE, board.BOTTOMROW), board.POLETHREE, board.BOTTOMROW);
+		board.sudoMovePiece(board.getPiece(board.POLETWO, board.BOTTOMROW-1), board.POLEONE, board.BOTTOMROW);
+		board.sudoMovePiece(board.getPiece(board.POLETWO, board.BOTTOMROW), board.POLETHREE, board.BOTTOMROW-1);
+		board.sudoMovePiece(board.getPiece(board.POLEONE, board.BOTTOMROW), board.POLETHREE, board.BOTTOMROW-2);
+		*/
 		
 		System.out.println("-----------");
 		
 		System.out.println(board);
-		//System.out.println(board.solved());
 		
+		//System.out.println(board.solved(3, board.POLETHREE));
 		
-		/*
-		 * 
-		 * Fix piece being able to move illegally
-		 * 
-		 */
 		
 
 	}

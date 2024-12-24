@@ -3,37 +3,40 @@ package main;
 public class Piece {
 	private int value;
 	public int x,y;  // Make these public for ease of use??
-	private Piece topPiece;
-	private Piece bottomPiece;
+	//private Piece parentPiece;
+	//private Piece childPiece;
 	
 	public Piece(int value, int x, int y) {
 		this.value = value;
 		this.x = x;
 		this.y = y;
-		topPiece = null;
-		bottomPiece = null;
+		
+		//parentPiece = null;
+		//childPiece = null;
 	}
 	
-	public void setop(Piece top) {
-		topPiece = top;
+	/*
+	 public void addChild(Piece piece) {
+		childPiece = piece;
 	}
 	
-	public void setottom(Piece bottom) {
-		bottomPiece = bottom;
+	public void addParent(Piece piece) {
+		parentPiece = piece;
 	}
 	
-	public void removeTop() {
-		topPiece = null;
+	public void removeChild() {
+		childPiece = null;
 	}
 	
-	public void removeBottom() {
-		bottomPiece = null;
+	public void removeParent() {
+		parentPiece = null;
 	}
-	
+	 */
 	
 	public int getValue() {
 		return value;
 	}
+	
 	
 	public String toString() {
 		if(value == -1) {
