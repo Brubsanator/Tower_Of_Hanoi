@@ -51,30 +51,7 @@ public class Board {
 		return board;
 	}
 	
-	public boolean sudoMovePiece(Piece piece, int col, int row) {
-		if(piece.getValue() > pieces || piece.getValue() <= 0) {
-			System.out.println("Error Moving Piece: Piece cannot be moved or doesn't exist");
-			return false;
-		}
-		if(row > BOTTOMROW || row < 1) {
-			System.out.println("Error Moving Piece: Row Out of bounds");
-			return false;
-		}
-		if( col < POLEONE || col > POLETHREE) {
-			System.out.println("Error Moving Piece: Col Out of bounds");
-			return false;
-		}
-		if(!(legalMove(piece, col, row))) return false;
-		
-		int originalRow = piece.y;
-		int originalCol = piece.x;
-		
-		board[originalRow][originalCol] = new Piece(0, originalCol, originalRow);
-		board[row][col] = new Piece(piece.getValue(), col, row);
-		return true;
-	}	
-	
-	private void movePiece(Piece piece, int col) {
+	public void movePiece(Piece piece, int col) {
 		if(piece.getValue() > pieces || piece.getValue() <= 0) {
 			System.out.println("Error Moving Piece: Piece cannot be moved or doesn't exist");
 			return;
@@ -85,7 +62,16 @@ public class Board {
 		}
 		
 		for(int row = BOTTOMROW; row > 0; row--) {
-			if(sudoMovePiece(piece, col, row)) return;
+			if(legalMove(piece, col, row)) {
+				int originalRow = piece.y;
+				int originalCol = piece.x;
+				
+				board[row][col] = piece;
+				board[row][col].x = col;
+				board[row][col].y = row;
+				board[originalRow][originalCol] = new Piece(0, originalCol, originalRow);
+				return;
+			}
 		}
 		
 		System.out.println("Error Move Piece: Cannot move piece");
@@ -109,15 +95,19 @@ public class Board {
 			movePiece(piece, col);
 			return true;
 		}
-		// Has piece ontop
+		
+		// Has piece on top
 		if(board[piece.y-1][piece.x].getValue() != 0) {
 			swapPoles(piece.x);
-			solve(findPiece(board[piece.y-1][piece.x].getValue()-1), SOLUTIONPOLE);
+			solve(board[piece.y-1][piece.x], SOLUTIONPOLE);
 			swapPoles(piece.x);
 		}
 		
+		
+		//System.out.println("Passes Through");
 		movePiece(piece, col);
-		solve(findPiece(board[piece.y-1][piece.x].getValue()-1), SOLUTIONPOLE);
+		//System.out.println(piece.getValue());
+		solve(findPiece(piece.getValue()-1), SOLUTIONPOLE);
 		
 		
 		return true;
@@ -184,21 +174,20 @@ public class Board {
 		
 		// If piece above it
 		if(board[piece.y-1][piece.x].getValue() != 0) {
-			System.out.println("Above it");
+			//System.out.println("Above it");
 			return false;
 		}
 		
 		
 		// Space is occupied
 		if(board[row][col].getValue() != 0) {
-			System.out.println(board[col][row].getValue());
-			System.out.println("Occupied");
+			//System.out.println("Occupied");
 			return false;
 		}
 		
 		// If the piece below it is less than the piece we want to move, then it's an illegal move
 		if(row != BOTTOMROW && board[row+1][col].getValue() < piece.getValue()) {
-			System.out.println("Too low");
+			//System.out.println("Too low");
 			return false;
 		}
 		
