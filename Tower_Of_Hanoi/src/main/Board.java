@@ -168,7 +168,7 @@ public class Board {
 		}
 		
 		// Piece already there
-		if(board[col][row].getValue() == piece.getValue()) {
+		if(board[row][col].getValue() == piece.getValue()) {
 			return true;
 		}
 		

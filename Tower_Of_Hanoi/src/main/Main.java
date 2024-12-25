@@ -2,7 +2,7 @@ package main;
 
 public class Main {
 	public static void main(String args[]) {
-		int pieces = 3;
+		int pieces = 5;
 		Board board = new Board(pieces);
 		
 		System.out.println(board);
